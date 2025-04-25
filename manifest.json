@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "A_H_ Attention Hyperactivater",
+  "version": "6.0",
+  "description": "Help people with ADHD stay focused with site blocking, Pomodoro timer, and more.",
+  "permissions": [
+    "tabs",
+    "storage",
+    "webNavigation",
+    "notifications",
+    "scripting",
+    "alarms"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "web_accessible_resources": [{
+    "resources": ["heymanthatsnotnice.wav", "blocked.html"],
+    "matches": ["<all_urls>"]
+  }]
+}

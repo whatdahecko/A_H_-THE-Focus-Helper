@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Take a Break</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #e0f7fa;
+      color: #006064;
+      padding: 50px;
+      line-height: 1.6;
+    }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 30px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    .timer {
+      font-size: 3rem;
+      margin: 20px 0;
+    }
+    .break-tips {
+      text-align: left;
+      margin: 30px 0;
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #00838f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px;
+    }
+    .button:hover {
+      background-color: #006064;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Time for a Break!</h1>
+    
+    <p>Taking regular breaks helps improve focus and productivity.</p>
+    
+    <div class="timer" id="break-timer">5:00</div>
+    
+    <button class="button" id="start-break">Start 5-Minute Break</button>
+    
+    <div class="break-tips">
+      <h2>Quick Break Ideas:</h2>
+      <ul>
+        <li>Stand up and stretch</li>
+        <li>Do a quick set of jumping jacks</li>
+        <li>Get a glass of water</li>
+        <li>Look out the window at something in the distance (helps with eye strain)</li>
+        <li>Take several deep breaths</li>
+        <li>Tidy your desk</li>
+      </ul>
+    </div>
+    
+    <button class="button" id="return-to-work">Return to Work</button>
+  </div>
+
+  <script>
+    let timerInterval;
+    let seconds = 300; // 5 minutes
+    
+    document.getElementById('start-break').addEventListener('click', function() {
+      startTimer();
+      this.disabled = true;
+    });
+    
+    document.getElementById('return-to-work').addEventListener('click', function() {
+      window.close();
+    });
+    
+    function startTimer() {
+      updateTimerDisplay();
+      
+      timerInterval = setInterval(() => {
+        seconds--;
+        updateTimerDisplay();
+        
+        if (seconds <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById('break-timer').textContent = "Break complete!";
+          document.getElementById('start-break').disabled = false;
+        }
+      }, 1000);
+    }
+    
+    function updateTimerDisplay() {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      document.getElementById('break-timer').textContent = 
+        `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    }
+  </script>
+</body>
+</html>

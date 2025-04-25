@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus Time - Site Blocked</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #6e8efb, #a777e3);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #333;
+    }
+    
+    .container {
+      background-color: white;
+      border-radius: 20px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 600px;
+      padding: 40px;
+      text-align: center;
+      animation: bounceIn 0.8s;
+    }
+    
+    @keyframes bounceIn {
+      0% { transform: scale(0.3); opacity: 0; }
+      50% { transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      color: #ff6b6b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 800;
+    }
+    
+    .subtitle {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 30px;
+      font-weight: 600;
+    }
+    
+    .message {
+      font-size: 20px;
+      color: #333;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+    
+    .highlight {
+      color: #ff6b6b;
+      font-weight: 600;
+    }
+    
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    .button {
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      font-family: 'Nunito', sans-serif;
+    }
+    
+    .primary-btn {
+      background-color: #ff6b6b;
+      color: white;
+      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+    }
+    
+    .primary-btn:hover {
+      background-color: #ff5252;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
+    }
+    
+    .secondary-btn {
+      background-color: #f8f9fa;
+      color: #555;
+      border: 2px solid #e9ecef;
+    }
+    
+    .secondary-btn:hover {
+      background-color: #e9ecef;
+      transform: translateY(-3px);
+    }
+    
+    .emoji {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+    
+    .timer {
+      font-size: 24px;
+      margin: 20px 0;
+      color: #6e8efb;
+      font-weight: 600;
+    }
+    
+    .focus-tip {
+      background-color: #f8f9fa;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 30px 0;
+      text-align: left;
+      position: relative;
+      min-height: 100px;
+    }
+    
+    .focus-tip h3 {
+      color: #6e8efb;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    
+    .focus-tip p {
+      color: #666;
+      font-size: 16px;
+      line-height: 1.5;
+      transition: opacity 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s forwards;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="emoji">⏱️</div>
+    <h1>Focus Time</h1>
+    <p class="subtitle">This site is currently blocked</p>
+    
+    <p class="message">
+      Hey there! This website is <span class="highlight">not on your approved list</span>. 
+      Let's stay on track with your important tasks!
+    </p>
+    
+    <div class="focus-tip">
+      <h3>Focus Tip: <span id="tip-number">1</span>/8</h3>
+      <p id="focus-tip">Try the 'Pomodoro Technique' - work for 25 minutes, then take a 5-minute break. It's a great way to maintain focus!</p>
+    </div>
+    
+    <div class="timer" id="focus-timer">
+      Let's focus for another <span id="minutes">25</span>:<span id="seconds">00</span> minutes
+    </div>
+    
+    <div class="button-container">
+      <a href="https://www.google.com" class="button primary-btn">Go to Google</a>
+      <button class="button secondary-btn" id="go-back-btn">Go Back</button>
+      <button class="button secondary-btn" id="next-tip-btn">Next Tip</button>
+    </div>
+  </div>
+
+  <script>
+    // Array of focus tips
+    const focusTips = [
+      "Try the 'Pomodoro Technique' - work for 25 minutes, then take a 5-minute break. It's a great way to maintain focus!",
+      "Take a deep breath! Inhale for 4 seconds, hold for 4, and exhale for 4. This can help reset your focus.",
+      "Try to eliminate distractions in your environment. Put your phone on silent and in another room.",
+      "Break big tasks into smaller, manageable chunks. This makes them less overwhelming!",
+      "Stay hydrated! Drinking water helps your brain function at its best.",
+      "Movement helps focus. Try a quick stretch or a few jumping jacks to reset your brain.",
+      "Use positive self-talk: 'I can do this' or 'I'm making progress' instead of focusing on what's left to do.",
+      "Try the '5-4-3-2-1' technique: Name 5 things you see, 4 things you feel, 3 things you hear, 2 things you smell, and 1 thing you taste."
+    ];
+    
+    // Set up DOM elements
+    const focusTipElement = document.getElementById('focus-tip');
+    const tipNumberElement = document.getElementById('tip-number');
+    const nextTipButton = document.getElementById('next-tip-btn');
+    const goBackButton = document.getElementById('go-back-btn');
+    
+    // Set up go back functionality
+    goBackButton.addEventListener('click', () => {
+      window.history.back();
+    });
+    
+    // Current tip index
+    let currentTipIndex = 0;
+    
+    // Function to update the tip
+    function updateTip() {
+      // Fade out effect
+      focusTipElement.style.opacity = 0;
+      
+      setTimeout(() => {
+        // Update the tip text
+        focusTipElement.textContent = focusTips[currentTipIndex];
+        // Update the tip number (1-based)
+        tipNumberElement.textContent = (currentTipIndex + 1);
+        
+        // Fade in effect
+        focusTipElement.style.opacity = 1;
+        
+        // Increment for next time, with wrap-around
+        currentTipIndex = (currentTipIndex + 1) % focusTips.length;
+      }, 500); // Wait for fade out before changing content
+    }
+    
+    // Set up automatic rotation every 15 seconds
+    let tipRotationInterval = setInterval(updateTip, 300);
+    
+    // Also allow manual navigation
+    nextTipButton.addEventListener('click', () => {
+      // Clear the automatic interval and restart it
+      clearInterval(tipRotationInterval);
+      updateTip();
+      // Restart automatic rotation
+      tipRotationInterval = setInterval(updateTip, 15000);
+    });
+    
+    // Simple countdown timer
+    let totalSeconds = 25 * 60; // 25 minutes
+    const minutesDisplay = document.getElementById('minutes');
+    const secondsDisplay = document.getElementById('seconds');
+    
+    function updateTimer() {
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      
+      minutesDisplay.textContent = minutes.toString().padStart(2, '0');
+      secondsDisplay.textContent = seconds.toString().padStart(2, '0');
+      
+      if (totalSeconds > 0) {
+        totalSeconds--;
+        setTimeout(updateTimer, 1000);
+      }
+    }
+    
+    // Start the timer
+    updateTimer();
+  </script>
+</body>
+</html>

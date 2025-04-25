@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Refocus Time</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f5f5f5;
+      color: #333;
+      padding: 50px;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+    
+    .tip {
+      text-align: left;
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #e9f7fe;
+      border-left: 4px solid #007bff;
+      border-radius: 4px;
+    }
+    
+    .button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    
+    .button:hover {
+      background-color: #0056b3;
+    }
+    
+    .timer {
+      font-size: 48px;
+      margin: 20px 0;
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Let's Refocus!</h1>
+    <p>It's okay to get distracted sometimes. Let's take a quick break and then get back on track.</p>
+    
+    <div class="timer" id="timer">01:00</div>
+    
+    <div class="tip">
+      <strong>Quick Tip:</strong> Try the 2-minute rule. If you've been distracted, commit to focusing for just 2 minutes. Often, you'll find yourself continuing beyond that time once you've started.
+    </div>
+    
+    <div class="tip">
+      <strong>ADHD Reminder:</strong> Break your task into smaller, more manageable chunks. Celebrate each small victory!
+    </div>
+    
+    <button class="button" id="start-focus">Start Focus Timer</button>
+    <button class="button" id="return-btn">Return to Previous Page</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const timerDisplay = document.getElementById('timer');
+      const startFocusBtn = document.getElementById('start-focus');
+      const returnBtn = document.getElementById('return-btn');
+      let countdown;
+      let seconds = 60;
+      
+      // Start focus timer
+      startFocusBtn.addEventListener('click', () => {
+        startFocusBtn.disabled = true;
+        
+        countdown = setInterval(() => {
+          seconds--;
+          
+          // Format and display the time
+          const minutes = Math.floor(seconds / 60);
+          const remainingSeconds = seconds % 60;
+          timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+          
+          if (seconds <= 0) {
+            clearInterval(countdown);
+            timerDisplay.textContent = "Time's up!";
+            startFocusBtn.disabled = false;
+            
+            // Show alert when timer finishes
+            alert("Great job refocusing! Now let's get back to work.");
+          }
+        }, 1000);
+      });
+      
+      // Return to previous page
+      returnBtn.addEventListener('click', () => {
+        window.history.back();
+      });
+    });
+  </script>
+</body>
+</html>
