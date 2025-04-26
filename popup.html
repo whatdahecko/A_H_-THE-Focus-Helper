@@ -60,7 +60,56 @@
       gap: 15px;
       margin-top: 10px;
     }
-    
+    .toggle-switch {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  cursor: pointer;
+  font-size: 14px;}
+
+  .toggle-switch input[type="checkbox"] {
+    position: relative;
+    width: 50px;
+    height: 25px;
+    background-color: #c6c6c6;
+    border-radius: 25px;
+    outline: none;
+    transition: .4s;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
+  .toggle-switch input:checked[type="checkbox"] {
+    background-color: var(--accent-color, #4cd137);
+  }
+
+  .toggle-switch input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+    transform: scale(1.1);
+    transition: .4s;
+  }
+
+  .toggle-switch input:checked[type="checkbox"]::before {
+    left: 27px;
+  }
+
+  .toggle-label {
+    font-weight: bold;
+  }
+
+  .setting-info {
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 15px;
+  }  
     .feature-card {
       background-color: white;
       border-radius: 8px;
@@ -235,6 +284,300 @@
       margin-bottom: 5px;
       color: #666;
     }
+    .theme-grid {
+      display: grid;
+       grid-template-columns: 1fr 1fr;
+       gap: 15px;
+       margin-top: 15px;
+    }
+    .theme-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .theme-card.active {
+      border: 2px solid #4A69BD;
+      transform: translateY(-3px);
+    }
+    .theme-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .theme-preview {
+      height: 80px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    /* Theme Previews */
+    .default-theme {
+      background: linear-gradient(45deg, #4A69BD, #6C87D8);
+      border: 1px solid #3A559B;
+    }
+
+    .dark-theme {
+      background: linear-gradient(45deg, #2D3436, #636E72);
+      border: 1px solid #1E272E;
+    }
+
+    .calm-theme {
+      background: linear-gradient(45deg, #55ACEE, #98DFEA);
+      border: 1px solid #47A0DE;
+    }
+
+    .energetic-theme {
+      background: linear-gradient(45deg, #FF6B6B, #FFC65C);
+      border: 1px solid #EE5B5B;
+    }
+
+    /* Theme Classes - These will be applied to body */
+    body.theme-default {
+      --primary-color: #4A69BD;
+      --primary-dark: #3A559B;
+      --secondary-color: #f9f9f9;
+      --text-color: #333;
+      --card-bg: white;
+      --accent-color: #4cd137;
+      --warning-color: #fbc531;
+      --danger-color: #e84118;
+      --light-bg: #f1f2f6;
+    }
+
+    body.theme-dark {
+      --primary-color: #2D3436;
+      --primary-dark: #1E272E;
+      --secondary-color: #222;
+      --text-color: #f5f5f5;
+      --card-bg: #333;
+      --accent-color: #55ACEE;
+      --warning-color: #F9BE32;
+      --danger-color: #FF4757;
+      --light-bg: #3d3d3d;
+    }
+
+    body.theme-calm {
+      --primary-color: #55ACEE;
+      --primary-dark: #47A0DE;
+      --secondary-color: #f0f8ff;
+      --text-color: #336699;
+      --card-bg: white;
+      --accent-color: #A3D9C9;
+      --warning-color: #FED766;
+      --danger-color: #FE5F55;
+      --light-bg: #e6f7ff;
+    }
+
+    body.theme-energetic {
+      --primary-color: #FF6B6B;
+      --primary-dark: #EE5B5B;
+      --secondary-color: #fff9f0;
+      --text-color: #D83367;
+      --card-bg: white;
+      --accent-color: #7CDB8A;
+      --warning-color: #FFC65C;
+      --danger-color: #e84118;
+      --light-bg: #FFF1E6;
+    }
+
+    /* CSS that uses the theme variables */
+    body[class*="theme-"] {
+      background-color: var(--secondary-color);
+      color: var(--text-color);
+    }
+
+    body[class*="theme-"] .header {
+      background-color: var(--primary-color);
+      border-bottom: 3px solid var(--primary-dark);
+    }
+
+    body[class*="theme-"] .feature-card {
+      background-color: var(--card-bg);
+    }
+
+    body[class*="theme-"] .feature-icon {
+      color: var(--primary-color);
+    }
+
+    body[class*="theme-"] button {
+      background-color: var(--primary-color);
+    }
+
+    body[class*="theme-"] button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    body[class*="theme-"] li {
+      background-color: var(--light-bg);
+    }
+
+    body[class*="theme-"] .start-button {
+      background-color: var(--accent-color);
+    }
+
+    body[class*="theme-"] .pause-button {
+      background-color: var(--warning-color);
+    }
+
+    body[class*="theme-"] .reset-button {
+      background-color: var(--danger-color);
+    }
+
+    body[class*="theme-"] .timer-settings,
+    body[class*="theme-"] .timer-progress {
+      background-color: var(--light-bg);
+    }
+
+    body[class*="theme-"] .progress-bar {
+      background-color: var(--primary-color);
+    }
+   
+        /* Minimized View Styles */
+    .minimized-container {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      width: 120px;
+      background-color: var(--primary-color, #4A69BD);
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      padding: 8px;
+      z-index: 9999;
+      color: white;
+      text-align: center;
+    }
+
+    .minimize-button {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .minimized-timer {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+
+    .minimized-phase {
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .minimized-controls {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 5px;
+    }
+
+    .minimized-button {
+      padding: 3px 6px;
+      border: none;
+      border-radius: 3px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .restore-button {
+      width: 100%;
+      margin-top: 5px;
+    }
+    /* To-Do List Styles */
+    .todo-input-area {
+      display: flex;
+      margin-bottom: 15px;
+    }
+
+    .todo-input-area input {
+      flex: 1;
+      margin-right: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .todo-list-container {
+      max-height: 250px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+      padding: 5px 0;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      background-color: var(--light-bg, #f1f2f6);
+      margin-bottom: 5px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    .todo-item:hover {
+      background-color: var(--card-bg, white);
+    }
+
+    .todo-checkbox {
+      margin-right: 10px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-color, #4cd137);
+    }
+
+    .todo-text {
+      flex: 1;
+      word-break: break-word;
+    }
+
+    .delete-todo {
+      padding: 3px 8px;
+      background-color: var(--danger-color, #e84118);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+
+    .todo-item.completed .todo-text {
+      text-decoration: line-through;
+      color: #aaa;
+    }
+
+    .empty-todo {
+      text-align: center;
+      padding: 15px;
+      color: #888;
+      font-style: italic;
+      background-color: transparent;
+    }
+
+    .todo-controls {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    #clear-completed-btn {
+      background-color: var(--warning-color, #fbc531);
+      color: white;
+    }
+
   </style>
 </head>
 <body>
@@ -252,6 +595,7 @@
       <button id="back-button" class="back-button hidden">←</button>
       <h1>ADHD Focus Assistant</h1>
     </div>
+    <button id="minimize-button" class="minimize-button">−</button>
     
     <!-- Homepage with feature cards -->
     <div id="homepage" class="homepage">
@@ -261,7 +605,11 @@
           <h3>Site Blocker</h3>
           <p>Manage allowed websites</p>
         </div>
-        
+        <div class="feature-card" data-feature="todo-list">
+          <div class="feature-icon">📝</div>
+          <h3>To-Do List</h3>
+          <p>Keep track of your tasks</p>
+        </div>
         <div class="feature-card" data-feature="pomodoro-timer">
           <div class="feature-icon">⏱️</div>
           <h3>Pomodoro Timer</h3>
@@ -273,7 +621,11 @@
           <h3>Focus Check</h3>
           <p>Regular focus reminders</p>
         </div>
-        
+        <div class="feature-card" data-feature="theme-settings">
+          <div class="feature-icon">🎨</div>
+          <h3>Themes/COMING SOON/</h3>
+          <p>Customize appearance</p>
+        </div>
         <div class="feature-card" data-feature="site-stats">
           <div class="feature-icon">📊</div>
           <h3>Site Stats</h3>
@@ -281,11 +633,33 @@
         </div>
       </div>
     </div>
-    
+    <!-- To-Do List Page -->
+    <div id="todo-list" class="feature-page hidden">
+      <h2>To-Do List</h2>
+      <div class="todo-input-area">
+        <input type="text" id="todo-input" placeholder="Add a new task...">
+        <button id="add-todo-btn">Add</button>
+      </div>
+      <div class="todo-list-container">
+        <ul id="todo-items"></ul>
+      </div>
+      <div class="todo-controls">
+        <button id="clear-completed-btn">Clear Completed</button>
+      </div>
+    </div>
     <!-- Site Blocker Page -->
     <div id="site-blocker" class="feature-page hidden">
       <h2>Manage Allowed Sites</h2>
       <div>
+        <div class="setting-group">
+          <label class="toggle-switch">
+            <input type="checkbox" id="enable-site-blocker" checked>
+            <span class="toggle-label">Enable Site Blocking</span>
+          </label>
+        </div>
+        <div class="setting-info">
+          <p>When disabled, no sites will be blocked.</p>
+        </div>
         <label for="site-url">Enter Site URL:</label>
         <input type="text" id="site-url" placeholder="e.g., example.com">
         <button id="add-allowed">Add to Allowed List</button>
@@ -356,7 +730,31 @@
         </label>
       </div>
     </div>
-    
+    <!-- Theme Settings Page -->
+    <div id="theme-settings" class="feature-page hidden">
+      <h2>Theme Settings</h2>
+      <div class="theme-options">
+        <h3>Choose a Theme</h3>
+        <div class="theme-grid">
+          <div class="theme-card" data-theme="default">
+            <div class="theme-preview default-theme"></div>
+            <span>Default</span>
+          </div>
+          <div class="theme-card" data-theme="dark">
+            <div class="theme-preview dark-theme"></div>
+            <span>Dark</span>
+          </div>
+          <div class="theme-card" data-theme="calm">
+            <div class="theme-preview calm-theme"></div>
+            <span>Calm</span>
+          </div>
+          <div class="theme-card" data-theme="energetic">
+            <div class="theme-preview energetic-theme"></div>
+            <span>Energetic</span>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Site Stats Page -->
     <div id="site-stats" class="feature-page hidden">
       <h2>Site Frequency</h2>
@@ -369,5 +767,16 @@
   </div>
 
   <script src="popup.js"></script>
+<!-- Minimized View -->
+<div id="minimized-view" class="minimized-container hidden">
+  <div class="minimized-phase" id="minimized-phase">Work Time</div>
+  <div class="minimized-timer" id="minimized-timer">25:00</div>
+  <div class="minimized-controls">
+    <button class="minimized-button start-button" id="minimized-start">▶</button>
+    <button class="minimized-button pause-button hidden" id="minimized-pause">⏸</button>
+    <button class="minimized-button reset-button" id="minimized-reset">⟳</button>
+  </div>
+  <button class="minimized-button restore-button" id="restore-button">Restore</button>
+</div>
 </body>
 </html>

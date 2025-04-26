@@ -1,13 +1,14 @@
 // Global cache for allowed sites
 let allowedSitesCache = [];
 const allowedTabs = new Map(); // Keeps track of allowed tabs and their hostnames
-
+let siteBlockerEnabled = true; 
 // Site statistics tracking
 let siteStats = {};
 let lastFocusCheckTime = 0;
 let focusCheckEnabled = true;
 let focusCheckInterval = 15; // Default 15 minutes
 let focusMessage = "Are you staying focused?";
+
 
 // Preload allowed sites and settings on extension startup
 chrome.runtime.onStartup.addListener(() => {
@@ -19,27 +20,42 @@ chrome.runtime.onInstalled.addListener(() => {
   loadSettings();
 });
 
+
 function loadSettings() {
-  chrome.storage.local.get(["allowedSites", "siteStats", "focusCheckEnabled", "focusCheckInterval", "focusMessage"], (result) => {
-    allowedSitesCache = result.allowedSites || [];
-    siteStats = result.siteStats || {};
-    focusCheckEnabled = result.focusCheckEnabled !== undefined ? result.focusCheckEnabled : true;
-    focusCheckInterval = result.focusCheckInterval || 15;
-    focusMessage = result.focusMessage || "Are you staying focused?";
+  // First get the site blocker enabled status
+  chrome.storage.local.get(["siteBlockerEnabled"], (enabledResult) => {
+    const isEnabled = enabledResult.siteBlockerEnabled !== undefined ? 
+                      enabledResult.siteBlockerEnabled : true;
     
-    console.log("Settings loaded:", {
-      allowedSites: allowedSitesCache,
-      focusCheckEnabled,
-      focusCheckInterval,
-      focusMessage
-    });
-    
-    // Start periodic focus checks if enabled
-    if (focusCheckEnabled) {
-      startFocusChecks();
+    if (!isEnabled) {
+      // Skip blocking and allow all sites
+      return;
     }
+    
+    // Then get the rest of the settings
+    chrome.storage.local.get(["allowedSites", "siteStats", "focusCheckEnabled", "focusCheckInterval", "focusMessage"], (result) => {
+      allowedSitesCache = result.allowedSites || [];
+      siteStats = result.siteStats || {};
+      focusCheckEnabled = result.focusCheckEnabled !== undefined ? result.focusCheckEnabled : true;
+      focusCheckInterval = result.focusCheckInterval || 15;
+      focusMessage = result.focusMessage || "Are you staying focused?";
+      
+      console.log("Settings loaded:", {
+        allowedSites: allowedSitesCache,
+        focusCheckEnabled,
+        focusCheckInterval,
+        focusMessage
+      });
+      
+      // Start periodic focus checks if enabled
+      if (focusCheckEnabled) {
+        startFocusChecks();
+      }
+    });
   });
 }
+
+
 
 // Update settings cache whenever storage changes
 chrome.storage.onChanged.addListener((changes, areaName) => {
@@ -77,13 +93,19 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
   }
 
   const url = new URL(details.url);
-  console.log("Navigating to:", url.hostname);
+  
+  // Check if this is a main frame navigation or an iframe/subframe
+  const isMainFrame = details.frameId === 0;
+  
+  console.log(`Navigating to: ${url.hostname} (${isMainFrame ? 'main frame' : 'iframe/subframe'})`);
 
   // Always allow Google and its subdomains
   if (url.hostname.endsWith("google.com")) {
     console.log(`Allowing Google site for tab ${details.tabId}: ${url.hostname}`);
-    allowedTabs.set(details.tabId, url.hostname);
-    updateSiteStats(url.hostname); // Track site visit
+    if (isMainFrame) {
+      allowedTabs.set(details.tabId, url.hostname);
+      updateSiteStats(url.hostname); // Track site visit
+    }
     return;
   }
 
@@ -94,11 +116,41 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
 
   if (isAllowed) {
     console.log(`Allowing site for tab ${details.tabId}: ${url.hostname}`);
-    allowedTabs.set(details.tabId, url.hostname);
-    updateSiteStats(url.hostname); // Track site visit
+    if (isMainFrame) {
+      allowedTabs.set(details.tabId, url.hostname);
+      updateSiteStats(url.hostname); // Track site visit
+    }
   } else {
-    console.log(`Blocking site for tab ${details.tabId}: ${url.hostname}`);
-    chrome.tabs.update(details.tabId, { url: chrome.runtime.getURL("blocked.html") });
+    // For main frames, block the entire navigation
+    if (isMainFrame) {
+      console.log(`Blocking site for tab ${details.tabId}: ${url.hostname}`);
+      chrome.tabs.update(details.tabId, { url: chrome.runtime.getURL("blocked.html") });
+    } else {
+      // For iframes, check if the parent tab is allowed
+      chrome.tabs.get(details.tabId, (tab) => {
+        if (tab && tab.url) {
+          try {
+            const parentUrl = new URL(tab.url);
+            const parentIsAllowed = allowedSitesCache.some((site) =>
+              parentUrl.hostname === site || parentUrl.hostname.endsWith(`.${site}`) || parentUrl.hostname.endsWith("google.com")
+            );
+            
+            if (parentIsAllowed) {
+              // If parent tab is allowed, allow the iframe content
+              console.log(`Allowing embedded content from ${url.hostname} in allowed parent site ${parentUrl.hostname}`);
+              return;
+            } else {
+              // If parent tab is not allowed (which shouldn't happen, but just in case),
+              // block the iframe content
+              console.log(`Blocking embedded content from ${url.hostname} in disallowed parent site ${parentUrl.hostname}`);
+              // Note: You can't redirect iframe navigation, so we just log it
+            }
+          } catch (e) {
+            console.error("Error parsing parent tab URL:", e);
+          }
+        }
+      });
+    }
   }
 }, { url: [{ schemes: ["http", "https"] }] });
 

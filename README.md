@@ -11,6 +11,6 @@ Site Blocker
 Site Tracker
 Focus Checker
 Pomodoro Timer
-<h2>Upcoming<h2>
-focus mdoe switch so it doesent work automatically
-idk themes maybe
+<h2>Bugs to fix<h2>
+themes dont save once you close the extension window
+the site blocker switch aint working

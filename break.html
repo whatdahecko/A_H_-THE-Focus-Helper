@@ -108,6 +108,53 @@
       document.getElementById('break-timer').textContent = 
         `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     }
+    function loadTodoItems() {
+      chrome.storage.local.get(['todoItems'], (result) => {
+        if (result.todoItems && result.todoItems.length > 0) {
+          todoItems.innerHTML = '';
+          result.todoItems.forEach(item => {
+            addTodoItemToUI(item.text, item.completed);
+          });
+        }
+      });
+    }
+// Add a new to-do item to the UI
+function addTodoItemToUI(text, completed = false) {
+  const li = document.createElement('li');
+  li.className = 'todo-item';
+  
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.className = 'todo-checkbox';
+  checkbox.checked = completed;
+  
+  const span = document.createElement('span');
+  span.className = 'todo-text';
+  if (completed) span.classList.add('completed');
+  span.textContent = text;
+  
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'todo-delete';
+  deleteBtn.textContent = 'Delete';
+  
+  li.appendChild(checkbox);
+  li.appendChild(span);
+  li.appendChild(deleteBtn);
+  
+  todoItems.appendChild(li);
+  
+  // Set up event listeners for this item
+  checkbox.addEventListener('change', function() {
+    span.classList.toggle('completed', this.checked);
+    saveTodoItems();
+  });
+  
+  deleteBtn.addEventListener('click', function() {
+    li.remove();
+    saveTodoItems();
+  });
+}
+
   </script>
 </body>
 </html>

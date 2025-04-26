@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+
   // Elements - General
   const welcomeScreen = document.getElementById('welcome-screen');
   const mainInterface = document.getElementById('main-interface');
@@ -13,7 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const addAllowedBtn = document.getElementById('add-allowed');
   const allowedListEl = document.getElementById('allowed-list');
   const siteUrlInput = document.getElementById('site-url');
-  
+
+  const siteBlockerToggle = document.getElementById('enable-site-blocker');
+
   // Elements - Pomodoro Timer
   const timerDisplay = document.getElementById('timer-display');
   const timerStartBtn = document.getElementById('timer-start');
@@ -22,12 +25,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const timerProgressBar = document.getElementById('timer-progress-bar');
   const timerPhaseEl = document.getElementById('timer-phase');
   const saveTimerSettingsBtn = document.getElementById('save-timer-settings');
-  const saveButton = document.getElementById('saveSettings');
-  
+  const saveButton = document.getElementById('save-focus-settings');
   // Get form elements (you'll need to use the correct IDs from your HTML)
   const intervalInput = document.getElementById('checkInterval');
   const notificationTextInput = document.getElementById('notificationText');
   const soundToggle = document.getElementById('soundEnabled');
+  // Elements - Theme Cards
+  const themeCards = document.querySelectorAll('.theme-card');
+  // Elements - Minimize/Restore
+  const minimizeButton = document.getElementById('minimize-button');
+  const minimizedView = document.getElementById('minimized-view');
+  const restoreButton = document.getElementById('restore-button');
+  const minimizedTimer = document.getElementById('minimized-timer');
+  const minimizedPhase = document.getElementById('minimized-phase');
+  const minimizedStartBtn = document.getElementById('minimized-start');
+  const minimizedPauseBtn = document.getElementById('minimized-pause');
+  const minimizedResetBtn = document.getElementById('minimized-reset');
+  const todoInput = document.getElementById('todo-input');
+  const addTodoBtn = document.getElementById('add-todo-btn');
+  const todoItems = document.getElementById('todo-items');
+  const clearCompletedBtn = document.getElementById('clear-completed-btn');
   // Pomodoro timer variables
   let workDuration = 25 * 60; // 25 minutes in seconds
   let breakDuration = 5 * 60;  // 5 minutes in seconds
@@ -39,7 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let isWorkPhase = true;
   let completedPomodoros = 0;
   let totalDuration = workDuration;
-
+  //set the theme wooooooooooooo
+  let currentTheme = 'default'; // Default theme
   // Welcome screen to main interface transition
   if (getStartedBtn) {
     getStartedBtn.addEventListener('click', () => {
@@ -231,7 +249,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize the allowed list on load
   updateAllowedList();
-  
   // Load Pomodoro timer settings
   function loadTimerSettings() {
     chrome.storage.local.get(['pomodoroSettings'], (result) => {
@@ -402,6 +419,8 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Load timer settings on popup open
   loadTimerSettings();
+  
+
   saveButton.addEventListener('click', function() {
     // Get values from the form
     const interval = intervalInput.value;
@@ -470,4 +489,250 @@ document.addEventListener('DOMContentLoaded', () => {
       soundEnabled: soundEnabled
     });
   }
-});
+    // Add the missing function
+  function adjustColor(hex, percent) {
+      // Convert hex to RGB
+    let r = parseInt(hex.substring(1, 3), 16);
+    let g = parseInt(hex.substring(3, 5), 16);
+    let b = parseInt(hex.substring(5, 7), 16);
+  
+    // Adjust brightness
+      r = Math.floor(r * (100 + percent) / 100);
+    g = Math.floor(g * (100 + percent) / 100);
+    b = Math.floor(b * (100 + percent) / 100);
+
+    // Make sure RGB values are within bounds
+    r = (r < 255) ? r : 255;
+    g = (g < 255) ? g : 255;
+    b = (b < 255) ? b : 255;
+
+    // Convert back to hex
+    return "#" + 
+           ((1 << 24) + (r << 16) + (g << 8) + b)
+           .toString(16).slice(1);
+  }
+
+  // At the beginning of your DOMContentLoaded event handler
+  if (siteBlockerToggle) {
+    siteBlockerToggle.addEventListener('change', () => {
+      const isEnabled = siteBlockerToggle.checked;
+      chrome.storage.local.set({ siteBlockerEnabled: isEnabled }, () => {
+        console.log(`Site blocker ${isEnabled ? 'enabled' : 'disabled'}`);
+        
+        // Create notification based on the new state
+        chrome.notifications.create({
+          type: 'basic',
+          iconUrl: chrome.runtime.getURL('icon48.png'),
+          title: isEnabled ? 'Site Blocker Enabled' : 'Site Blocker Disabled',
+          message: isEnabled ? 
+            'The site blocker is now active. You can add sites to the allowed list.' : 
+            'All sites will be accessible until you enable the site blocker again.',
+          silent: false
+        });
+        
+        // If you need to tell the background script about this change:
+        chrome.runtime.sendMessage({ 
+          type: "updateBlockerState", 
+          enabled: isEnabled 
+        });
+      });
+    });
+  }
+  // Minimize functionality
+  if (minimizeButton) {
+    minimizeButton.addEventListener('click', () => {
+      mainInterface.classList.add('hidden');
+      minimizedView.classList.remove('hidden');
+      
+      // Update minimized view with current timer state
+      minimizedTimer.textContent = timerDisplay.textContent;
+      minimizedPhase.textContent = timerPhaseEl.textContent;
+      
+      // Update button states to match
+      if (isPaused) {
+        minimizedStartBtn.classList.remove('hidden');
+        minimizedPauseBtn.classList.add('hidden');
+      } else {
+        minimizedStartBtn.classList.add('hidden');
+        minimizedPauseBtn.classList.remove('hidden');
+      }
+    });
+  }
+    // Restore functionality
+    if (restoreButton) {
+      restoreButton.addEventListener('click', () => {
+        minimizedView.classList.add('hidden');
+        mainInterface.classList.remove('hidden');
+      });
+    }
+
+    // Minimized view controls
+    if (minimizedStartBtn) {
+      minimizedStartBtn.addEventListener('click', () => {
+        startTimer();
+        minimizedStartBtn.classList.add('hidden');
+        minimizedPauseBtn.classList.remove('hidden');
+      });
+    }
+
+    if (minimizedPauseBtn) {
+      minimizedPauseBtn.addEventListener('click', () => {
+        pauseTimer();
+        minimizedPauseBtn.classList.add('hidden');
+        minimizedStartBtn.classList.remove('hidden');
+      });
+    }
+
+    if (minimizedResetBtn) {
+      minimizedResetBtn.addEventListener('click', resetTimer);
+    }
+
+    // Modify updateTimerDisplay to also update minimized view
+    function updateTimerDisplay() {
+      if (timerDisplay) {
+        timerDisplay.textContent = formatTime(timeRemaining);
+      }
+      
+      // Also update minimized timer if it exists
+      if (minimizedTimer) {
+        minimizedTimer.textContent = formatTime(timeRemaining);
+      }
+      
+      // Update progress bar
+      if (timerProgressBar) {
+        const percentage = ((totalDuration - timeRemaining) / totalDuration) * 100;
+        timerProgressBar.style.width = `${percentage}%`;
+      }
+
+    }
+  
+    if (addTodoBtn) {
+      addTodoBtn.addEventListener('click', addTodoItem);
+      todoInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          addTodoItem();
+        }
+      });
+    }
+  
+  if (clearCompletedBtn) {
+    clearCompletedBtn.addEventListener('click', clearCompletedTasks);
+  }
+  document.querySelectorAll('.feature-card').forEach(card => {
+    if (card.getAttribute('data-feature') === 'todo-list') {
+      card.addEventListener('click', () => {
+        loadTodoItems();
+      });
+    }
+  });
+  function addTodoItem() {
+    const taskText = todoInput.value.trim();
+    if (taskText) {
+      chrome.storage.local.get(['todoItems'], (result) => {
+        const todos = result.todoItems || [];
+        const newTodo = {
+          id: Date.now(), // Use timestamp as unique ID
+          text: taskText,
+          completed: false,
+          createdAt: new Date().toISOString()
+        };
+        
+        todos.push(newTodo);
+        chrome.storage.local.set({ todoItems: todos }, () => {
+          loadTodoItems(); // Refresh the list
+          todoInput.value = ''; // Clear input
+        });
+      });
+    }
+  }
+  // Function to load to-do items from storage
+function loadTodoItems() {
+  chrome.storage.local.get(['todoItems'], (result) => {
+    const todos = result.todoItems || [];
+    
+    if (todoItems) {
+      // Clear the current list
+      todoItems.innerHTML = '';
+      
+      if (todos.length === 0) {
+        // Show empty state
+        todoItems.innerHTML = '<li class="empty-todo">No tasks yet. Add one above!</li>';
+        return;
+      }
+      
+      // Sort by creation date (newest first)
+      todos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      
+      // Create list items
+      todos.forEach(todo => {
+        const li = document.createElement('li');
+        li.className = 'todo-item';
+        if (todo.completed) {
+          li.classList.add('completed');
+        }
+        
+        // Add checkbox
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'todo-checkbox';
+        checkbox.checked = todo.completed;
+        checkbox.addEventListener('change', () => toggleTodoComplete(todo.id, checkbox.checked));
+        
+        // Add task text
+        const span = document.createElement('span');
+        span.className = 'todo-text';
+        span.textContent = todo.text;
+        
+        // Add delete button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-todo';
+        deleteBtn.textContent = '✕';
+        deleteBtn.addEventListener('click', () => deleteTodoItem(todo.id));
+        
+        // Assemble the item
+        li.appendChild(checkbox);
+        li.appendChild(span);
+        li.appendChild(deleteBtn);
+        todoItems.appendChild(li);
+      });
+    }
+  });
+}
+  // Function to toggle the completed state of a to-do item
+function toggleTodoComplete(id, completed) {
+  chrome.storage.local.get(['todoItems'], (result) => {
+    const todos = result.todoItems || [];
+    const updatedTodos = todos.map(todo => {
+      if (todo.id === id) {
+        return { ...todo, completed };
+      }
+      return todo;
+    });
+    
+    chrome.storage.local.set({ todoItems: updatedTodos }, () => {
+      loadTodoItems(); // Refresh the list
+    });
+  });
+}
+function deleteTodoItem(id) {
+  chrome.storage.local.get(['todoItems'], (result) => {
+    const todos = result.todoItems || [];
+    const updatedTodos = todos.filter(todo => todo.id !== id);
+    
+    chrome.storage.local.set({ todoItems: updatedTodos }, () => {
+      loadTodoItems(); // Refresh the list
+    });
+  });
+}
+  // Function to clear all completed tasks
+function clearCompletedTasks() {
+  chrome.storage.local.get(['todoItems'], (result) => {
+    const todos = result.todoItems || [];
+    const remainingTodos = todos.filter(todo => !todo.completed);
+    
+    chrome.storage.local.set({ todoItems: remainingTodos }, () => {
+      loadTodoItems(); // Refresh the list
+    });
+  });
+}
+});  
